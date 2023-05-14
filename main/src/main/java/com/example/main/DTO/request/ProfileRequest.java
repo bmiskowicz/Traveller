@@ -15,8 +15,7 @@ import javax.validation.constraints.NotNull;
 public class ProfileRequest {
     @NotNull
     private Long profileId;
-    @NotNull
-    private Login login;
+
     private byte icon;
     @NotNull
     private String username;
