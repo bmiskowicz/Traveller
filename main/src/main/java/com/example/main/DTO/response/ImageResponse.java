@@ -1,18 +1,19 @@
 package com.example.main.DTO.response;
 
 
-import com.example.main.entity.Image;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.MediaType;
 
 @Setter
 @Getter
 public class ImageResponse {
-    private String src;
-    private String alt;
+    private byte[] src;
 
-    public ImageResponse(String src, String alt) {
+    private MediaType type;
+
+    public ImageResponse(byte[] src, MediaType type) {
         this.src = src;
-        this.alt = alt;
+        this.type = type;
     }
 }

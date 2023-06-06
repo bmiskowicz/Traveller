@@ -1,6 +1,7 @@
 package com.example.main.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -18,20 +19,21 @@ public class Image {
     @Column(unique = true, nullable = false, name = "imageId")
     private Long imageId;
 
-    @Column(nullable = false)
-    private String src;
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String data;
 
     @Column(nullable = false)
-    private String alt;
+    private String format;
+    @Column(nullable = false)
+    private String name;
 
-
-    @JsonBackReference
-    @ManyToOne()
-    @JoinColumn(name="postId", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private Post post;
 
-    public Image(String src, String alt) {
-        this.src = src;
-        this.alt = alt;
+    public Image(String data, String format, String name, Post post) {
+        this.data = data;
+        this.format = format;
+        this.name = name;
+        this.post = post;
     }
 }

@@ -1,16 +1,17 @@
 package com.example.main.service;
 
 import com.example.main.DTO.request.ImageRequest;
+import com.example.main.DTO.response.ImageResponse;
 import com.example.main.entity.Image;
+import com.example.main.entity.Post;
 import com.example.main.repository.ImageRepository;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.MediaType;
 
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -21,45 +22,32 @@ public class ImageService {
 
     @SneakyThrows
     @Transactional
-    public Image saveImage(ImageRequest imageRequest){
-        Image image = new Image(Base64.getEncoder().encodeToString(imageRequest.getData().getBytes()), imageRequest.getFormat());
+    public Image saveImage(ImageRequest imageRequest, Post post){
+
+        Image image = new Image(imageRequest.getData(), imageRequest.getFormat(), imageRequest.getName(), post);
         return imageRepository.save(image);
     }
 
-    public Image getImage(String id){
+    public ImageResponse getImage(Long id){
         Image image = null;
-        if(imageRepository.existsById(id)) {
-            image = imageRepository.findById(id).get();
+        if(imageRepository.existsByImageId(id)) {
+            image = imageRepository.findByImageId(id).get();
         }
-        return image;
+        return new ImageResponse(Base64.getDecoder().decode(image.getData()),
+                Objects.equals(image.getFormat(), "jpg") ? MediaType.IMAGE_JPEG : MediaType.IMAGE_PNG);
     }
 
     public Stream<Image> getAllImages(){
         return imageRepository.findAll().stream();
     }
 
-    @SneakyThrows
-    @Transactional
-    public void updateImage(ImageRequest imageRequest) {
-        Image image = null;
-        if(imageRepository.existsByImageId(imageRequest.getImageId())){
-            image = imageRepository.findByImageId(imageRequest.getImageId()).get();
-            image.setSrc(Base64.getEncoder().encodeToString(imageRequest.getData().getBytes()));
-            image.setAlt(imageRequest.getName());
-        }
-        imageRepository.save(image);
-    }
-    
-    public Set<Image> updateAllImages(Set<Image> actualImages, Set<ImageRequest> imageRequests){
-        Set<Image> images = new HashSet<>();
+    public List<Image> updateAllImages(List<Image> actualImages, List<ImageRequest> imageRequests, Post post){
+        List<Image> images = new ArrayList<>();
 
 
         for (ImageRequest imageRequest: imageRequests) {
-            images.add(saveImage(imageRequest));
-            if(imageRepository.existsByImageId(imageRequest.getImageId())){
-                updateImage(imageRequest);
-            }
-            else saveImage(imageRequest);
+            images.add(saveImage(imageRequest, post));
+            if(!imageRepository.existsByImageId(imageRequest.getImageId())) saveImage(imageRequest, post);
         }
 
 
@@ -70,19 +58,19 @@ public class ImageService {
         return images;
     }
 
-    public void deleteImage(String id){
+    public void deleteImage(Long id){
         Image image = null;
-        if(imageRepository.existsById(id)) {
-            image = imageRepository.findById(id).get();
+        if(imageRepository.existsByImageId(id)) {
+            image = imageRepository.findByImageId(id).get();
         }
         imageRepository.delete(image);
     }
 
     @SneakyThrows
-    public Set<Image> saveAllImages(Set<ImageRequest> imageRequests) {
-        Set<Image> images = new HashSet<>();
+    public List<Image> saveAllImages(List<ImageRequest> imageRequests, Post post) {
+        List<Image> images = new ArrayList<>();
         for (ImageRequest imageRequest: imageRequests) {
-            images.add(saveImage(imageRequest));
+            images.add(saveImage(imageRequest, post));
         }
         return images;
     }

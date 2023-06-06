@@ -1,10 +1,13 @@
 package com.example.main.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -26,10 +29,10 @@ public class Post {
     @Column(nullable = false)
     private String content;
 
-    @JsonBackReference
-    @OneToMany()
-    @JoinColumn(name="imageId")
-    private Set<Image> imagesToUpload = new HashSet<>();
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<Image> imagesToUpload = new ArrayList<>();
 
     @ManyToOne()
     @JoinColumn(name="profileId", nullable = false)

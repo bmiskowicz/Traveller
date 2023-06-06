@@ -5,11 +5,13 @@ import com.example.main.DTO.response.PostResponse;
 import com.example.main.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
+@Transactional
 @RestController
 @RequestMapping("/post")
 public class PostController {
@@ -36,9 +38,7 @@ public class PostController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createPost(PostRequest postRequest, HttpServletRequest httpRequest){
-        System.out.println(postRequest.getPostId());
-        System.out.println(postRequest.getName());
+    public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest, HttpServletRequest httpRequest){
         postService.createPost(postRequest, httpRequest);
         return ResponseEntity.ok(postRequest.getPostId());
     }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.Set;
 
 @Getter
@@ -25,9 +26,9 @@ public class LoginRequest {
     @NotNull
     private String email;
 
-    private Set<Role> roles;
+    private ArrayList<Role> roles;
 
-    public Set<Role> getRoles() {
+    public ArrayList<Role> getRoles() {
         return roles;
     }
 }

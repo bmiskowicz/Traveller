@@ -8,7 +8,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -23,5 +25,5 @@ public class PostRequest {
 
     private String content;
 
-    private Set<ImageRequest> imagesToUpload = new HashSet<>();
+    public List<ImageRequest> imagesToUpload = new ArrayList<>();
 }

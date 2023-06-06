@@ -2,6 +2,7 @@ package com.example.main.service;
 
 import com.example.main.DTO.request.PostRequest;
 import com.example.main.DTO.response.PostResponse;
+import com.example.main.entity.Image;
 import com.example.main.entity.Post;
 import com.example.main.entity.Profile;
 import com.example.main.entity.log.Login;
@@ -61,7 +62,7 @@ public class PostService {
             post = postRepository.findByPostId(postRequest.getPostId()).get();
             post.setContent(postRequest.getContent());
             post.setName(postRequest.getName());
-            post.setImagesToUpload(imageService.updateAllImages(post.getImagesToUpload(), postRequest.getImagesToUpload()));
+            post.setImagesToUpload(imageService.updateAllImages(post.getImagesToUpload(), postRequest.getImagesToUpload(), post));
         }
         return new PostResponse(post);
     }
@@ -76,8 +77,11 @@ public class PostService {
                 .content(postRequest.getContent())
                 .name(postRequest.getName())
                 .profile(profile)
-                .imagesToUpload(imageService.saveAllImages(postRequest.getImagesToUpload()))
                 .build();
+
+        List<Image> imagesToUpload =  imageService.saveAllImages(postRequest.getImagesToUpload(), post);
+        post.setImagesToUpload(imagesToUpload);
+
         postRepository.save(post);
         return new PostResponse(post);
     }
