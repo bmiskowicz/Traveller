@@ -47,7 +47,6 @@ public class ImageService {
 
         for (ImageRequest imageRequest: imageRequests) {
             images.add(saveImage(imageRequest, post));
-            if(!imageRepository.existsByImageId(imageRequest.getImageId())) saveImage(imageRequest, post);
         }
 
 

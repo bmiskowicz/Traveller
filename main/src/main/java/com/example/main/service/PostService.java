@@ -62,9 +62,9 @@ public class PostService {
         Post post = null;
         if(postRepository.existsByPostId(postRequest.getPostId())){
             post = postRepository.findByPostId(postRequest.getPostId()).get();
+            post.setImagesToUpload(imageService.updateAllImages(post.getImagesToUpload(), postRequest.getImagesToUpload(), post));
             post.setContent(postRequest.getContent());
             post.setName(postRequest.getName());
-            post.setImagesToUpload(imageService.updateAllImages(post.getImagesToUpload(), postRequest.getImagesToUpload(), post));
             postRepository.save(post);
 
         }

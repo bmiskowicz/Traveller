@@ -32,7 +32,7 @@ public class PostController {
 
 
     @PatchMapping(path = "/{id}/update")
-    public ResponseEntity<?> updatePost(PostRequest postRequest){
+    public ResponseEntity<?> updatePost(@RequestBody PostRequest postRequest){
         postService.updatePost(postRequest);
         return ResponseEntity.ok(postRequest.getPostId());
     }
