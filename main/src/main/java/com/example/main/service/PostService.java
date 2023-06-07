@@ -65,6 +65,8 @@ public class PostService {
             post.setContent(postRequest.getContent());
             post.setName(postRequest.getName());
             post.setImagesToUpload(imageService.updateAllImages(post.getImagesToUpload(), postRequest.getImagesToUpload(), post));
+            postRepository.save(post);
+
         }
         return new PostResponse(post);
     }
