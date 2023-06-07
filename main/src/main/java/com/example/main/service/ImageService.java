@@ -75,4 +75,7 @@ public class ImageService {
         return images;
     }
 
+    public void deleteAllImages(Post post) {
+        imageRepository.deleteAllByPost(post);
+    }
 }

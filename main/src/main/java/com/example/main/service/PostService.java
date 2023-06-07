@@ -6,6 +6,7 @@ import com.example.main.entity.Image;
 import com.example.main.entity.Post;
 import com.example.main.entity.Profile;
 import com.example.main.entity.log.Login;
+import com.example.main.repository.ImageRepository;
 import com.example.main.repository.PostRepository;
 import com.example.main.repository.ProfileRepository;
 import com.example.main.repository.log.LoginRepository;
@@ -26,13 +27,13 @@ public class PostService {
     @Autowired
     private ImageService imageService;
     @Autowired
-    JWTUtils jwtUtils;
+    private JWTUtils jwtUtils;
 
     @Autowired
-    LoginRepository loginRepository;
+    private LoginRepository loginRepository;
 
     @Autowired
-    ProfileRepository profileRepository;
+    private ProfileRepository profileRepository;
 
 
     public List<PostResponse> getAllPosts() {
@@ -52,6 +53,7 @@ public class PostService {
 
     public void deletePost(Long id) {
         if (postRepository.existsByPostId(id)) {
+            imageService.deleteAllImages(postRepository.findByPostId(id).get());
             postRepository.deleteByPostId(id);
         }
     }
