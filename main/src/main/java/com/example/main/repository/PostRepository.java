@@ -21,5 +21,9 @@ public interface PostRepository extends JpaRepository<Post,String> {
 
     boolean existsByPostId(Long aLong);
 
+    boolean existsByName(String string);
+
+    Optional<Post> findByName(String string);
+
     void deleteByPostId(Long aLong);
 }

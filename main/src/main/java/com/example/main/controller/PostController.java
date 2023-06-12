@@ -32,21 +32,18 @@ public class PostController {
 
 
     @PatchMapping(path = "/{id}/update")
-    public ResponseEntity<?> updatePost(@RequestBody PostRequest postRequest){
-        postService.updatePost(postRequest);
-        return ResponseEntity.ok(postRequest.getPostId());
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostRequest postRequest, HttpServletRequest httpRequest){
+        return postService.updatePost(id, postRequest, httpRequest);
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createPost(@RequestBody PostRequest postRequest, HttpServletRequest httpRequest){
-        postService.createPost(postRequest, httpRequest);
-        return ResponseEntity.ok(postRequest.getPostId());
+        return postService.createPost(postRequest, httpRequest);
     }
 
     @DeleteMapping(path = "/{id}/delete")
-    public ResponseEntity<?> deletePost(@PathVariable Long id){
-        postService.deletePost(id);
-        return (ResponseEntity.ok()).build();
+    public ResponseEntity<?> deletePost(@PathVariable Long id, HttpServletRequest httpRequest){
+        return postService.deletePost(id, httpRequest);
     }
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.example.main.DTO.request.log.AuthRequest;
@@ -18,10 +19,7 @@ import com.example.main.service.security.AuthService;
 import com.example.main.service.security.LoginService;
 import com.example.main.service.security.VerificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,18 +72,19 @@ public class AuthController {
     @Autowired
     AuthService authService;
     @PostMapping("api/auth/signin")
-    public ResponseEntity<?> getToken(@Valid @RequestBody AuthRequest loginRequest){
+    public ResponseEntity<?> getToken(@Valid @RequestBody AuthRequest loginRequest, HttpServletRequest httpServletRequest){
+        System.out.println(httpServletRequest.getRemoteAddr());
         return ResponseEntity.ok(authService.getAuthToken(loginRequest));
     }
 
     @PostMapping("api/auth/signup")
     public ResponseEntity<?> registerUser(@RequestBody LoginRequest loginRequest) {
         if (loginRepository.existsByUsername(loginRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(ResponseEntity.ok("Error: Username is already taken!"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Username is already taken!");
         }
 
         if (loginRepository.existsByEmail(loginRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(ResponseEntity.ok("Error: Email is already in use!"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Email is already in use!");
         }
 
         LoginResponse loginResponse = loginService.createLogin(loginRequest);

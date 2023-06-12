@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -27,15 +28,13 @@ public class ProfilesController {
 
 
     @PatchMapping(path = "/{id}/update")
-    public ResponseEntity<?> updateProfile(ProfileRequest profileRequest){
-        ProfileResponse profileResponse = profileService.updateProfile(profileRequest);
-        return ResponseEntity.ok(profileResponse);
+    public ResponseEntity<?> updateProfile(@RequestBody ProfileRequest profileRequest, HttpServletRequest httpRequest){
+        return profileService.updateProfile(profileRequest, httpRequest);
     }
 
 
     @DeleteMapping(path = "/{id}/delete")
-    public ResponseEntity<?> deleteProfile(@PathVariable Long id){
-        profileService.deleteProfile(id);
-        return (ResponseEntity.ok()).build();
+    public ResponseEntity<?> deleteProfile(@PathVariable Long id, HttpServletRequest httpRequest){
+        return profileService.deleteProfile(id, httpRequest);
     }
 }

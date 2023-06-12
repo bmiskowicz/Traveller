@@ -11,11 +11,14 @@ import com.example.main.repository.PostRepository;
 import com.example.main.repository.ProfileRepository;
 import com.example.main.repository.log.LoginRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.main.config.security.JWTUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,42 +54,72 @@ public class PostService {
     }
 
 
-    public void deletePost(Long id) {
+    public ResponseEntity<?> deletePost(Long id, HttpServletRequest httpRequest) {
         if (postRepository.existsByPostId(id)) {
-            imageService.deleteAllImages(postRepository.findByPostId(id).get());
-            postRepository.deleteByPostId(id);
+            Post post = postRepository.findByPostId(id).get();
+
+            String token = httpRequest.getHeader("Authorization");
+            String username = jwtUtils.getUserNameFromJwtToken(token);
+            Login login = loginRepository.findByUsername(username).get();
+
+            if(post.getProfile().getProfileId().equals(profileRepository.findById(login.getLoginId()).get().getProfileId())){
+                imageService.deleteAllImages(post);
+                postRepository.deleteByPostId(id);
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    public PostResponse updatePost(PostRequest postRequest) {
-        Post post = null;
-        if(postRepository.existsByPostId(postRequest.getPostId())){
-            post = postRepository.findByPostId(postRequest.getPostId()).get();
-            post.setImagesToUpload(imageService.updateAllImages(post.getImagesToUpload(), postRequest.getImagesToUpload(), post));
-            post.setContent(postRequest.getContent());
-            post.setName(postRequest.getName());
-            postRepository.save(post);
+    public ResponseEntity<?> updatePost(Long id, PostRequest postRequest, HttpServletRequest httpRequest) {
+        if(Objects.equals(id, postRequest.getPostId()) && postRepository.existsByPostId(postRequest.getPostId())){
+            Post post = postRepository.findByPostId(postRequest.getPostId()).get();
 
+            if(postRepository.existsByName(postRequest.getName()))
+                if(!postRepository.findByName(postRequest.getName()).get().getPostId().equals(id))
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body("Post with such name already exists");
+
+            String token = httpRequest.getHeader("Authorization");
+            String username = jwtUtils.getUserNameFromJwtToken(token);
+            Login login = loginRepository.findByUsername(username).get();
+
+
+            if(post.getProfile().getProfileId().equals(profileRepository.findById(login.getLoginId()).get().getProfileId())) {
+                post.setImagesToUpload(imageService.updateAllImages(post.getImagesToUpload(), postRequest.getImagesToUpload(), post));
+                post.setContent(postRequest.getContent());
+                post.setName(postRequest.getName());
+                postRepository.save(post);
+                return ResponseEntity.status(HttpStatus.OK).body(post.getPostId());
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return new PostResponse(post);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    public PostResponse createPost(PostRequest postRequest, HttpServletRequest httpRequest) {
+    public ResponseEntity<?> createPost(PostRequest postRequest, HttpServletRequest httpRequest) {
         String token = httpRequest.getHeader("Authorization");
         String username = jwtUtils.getUserNameFromJwtToken(token);
-        Login login = loginRepository.findByUsername(username).get();
-        Profile profile = profileRepository.findById(login.getLoginId()).get();
+        if (loginRepository.existsByUsername(username)) {
 
-        Post post = Post.builder()
-                .content(postRequest.getContent())
-                .name(postRequest.getName())
-                .profile(profile)
-                .build();
+            if(postRepository.existsByName(postRequest.getName()))
+                return ResponseEntity.status(HttpStatus.CONFLICT).body("Post with such name already exists");
 
-        List<Image> imagesToUpload =  imageService.saveAllImages(postRequest.getImagesToUpload(), post);
-        post.setImagesToUpload(imagesToUpload);
+            Login login = loginRepository.findByUsername(username).get();
+            Profile profile = profileRepository.findById(login.getLoginId()).get();
 
-        postRepository.save(post);
-        return new PostResponse(post);
+            Post post = Post.builder()
+                    .content(postRequest.getContent())
+                    .name(postRequest.getName())
+                    .profile(profile)
+                    .build();
+
+            List<Image> imagesToUpload = imageService.saveAllImages(postRequest.getImagesToUpload(), post);
+            post.setImagesToUpload(imagesToUpload);
+
+            postRepository.save(post);
+            return ResponseEntity.status(HttpStatus.CREATED).body(post.getPostId());
+        }
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

@@ -20,6 +20,7 @@ public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
     Optional<Profile> findById(Long aLong);
 
+    Optional<Profile> findByLogin(Long aLong);
 
     boolean existsById(Long aLong);
 
