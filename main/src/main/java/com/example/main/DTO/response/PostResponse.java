@@ -23,7 +23,7 @@ public class PostResponse {
         this.content = post.getContent();
         List<Image> imageList = post.getImagesToUpload();
         for (Image i: imageList) {
-            this.images.add(new PostImageResponse("http://localhost:8080/images/" + i.getImageId(), i.getName()));
+            this.images.add(new PostImageResponse("https://localhost:442/images/" + i.getImageId(), i.getName()));
         }
     }
 }

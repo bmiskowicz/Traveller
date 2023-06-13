@@ -34,7 +34,7 @@ public class VerificationTokenService {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(email);
         simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setText("Verification on page" + "\r\n" + "http://localhost:8080" + confirmationUrl);
+        simpleMailMessage.setText("Verification on page" + "\r\n" + "https://localhost:442" + confirmationUrl);
         mailSender.send(simpleMailMessage);
 
         return ResponseEntity.ok("Verification mail send on email: " + email);
